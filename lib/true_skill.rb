@@ -9,8 +9,6 @@ module TrueSkill
   require "true_skill/prior_factor"
   require "true_skill/rating"
   require "true_skill/sum_factor"
-  require "true_skill/true_skill"
-  require "true_skill/true_skill_object"
   require "true_skill/truncate_factor"
   require "true_skill/variable"
 
