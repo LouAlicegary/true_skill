@@ -9,30 +9,22 @@ module TrueSkill
 
       def initialize(mu=nil,sigma=nil)
         
-        if mu.kind_of?(Array)
-          mu,sigma=mu
-        end
+        mu,sigma = mu if mu.kind_of?(Array)
         
-        if mu.nil?
-          mu=g().mu
-        end
+        raise "Rating.new() must be passed a valid mu and sigma" if mu.nil? || sigma.nil?
         
-        if sigma.nil?
-          sigma=g().sigma
-        end
-        
-        super(mu,sigma)
+        super mu, sigma
       
       end
 
 
       def exposure
-        return mu-3*sigma
+        return mu - 3 * sigma
       end
 
 
       def to_s
-        return "[mu="+mu.to_s+",sigma="+sigma.to_s+"]"
+        return "[mu=" + mu.to_s + ",sigma=" + sigma.to_s + "]"
       end
 
 

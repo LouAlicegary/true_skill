@@ -2,25 +2,25 @@ module TrueSkill
 
     class TrueSkillObject
 
-      include TrueSkillGeneral
       include MathGeneral
 
-      attr_accessor :mu,:sigma,:beta,:tau,:draw_probability
-
-      @mu=nil
-      @sigma=nil
-      @beta=nil
-      @tau=nil
-      @draw_probability=nil
+      attr_accessor :mu, :sigma, :beta, :tau, :draw_probability
+      
+      # attr_accessor variables
+      @mu               = nil
+      @sigma            = nil
+      @beta             = nil
+      @tau              = nil
+      @draw_probability = nil
       
 
-      def initialize(mu=MU, sigma=SIGMA, beta=BETA, tau=TAU,draw_probability=DRAW_PROBABILITY)
+      def initialize(mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY)
         
-        @mu=mu
-        @sigma=sigma
-        @beta=beta
-        @tau=tau
-        @draw_probability=draw_probability
+        @mu               = mu
+        @sigma            = sigma
+        @beta             = beta
+        @tau              = tau
+        @draw_probability = draw_probability
 
 
         $vFunc = Proc.new do |diff,draw_margin|
@@ -59,42 +59,25 @@ module TrueSkill
       end
       
       
-      def Rating(mu=nil,sigma=nil)
-        if mu.nil?
-          mu=@mu
-        end
-        if sigma.nil?
-          sigma=@sigma
-        end
-        return Rating.new mu,sigma
+      def Rating(mu=nil, sigma=nil)
+        mu = @mu if mu.nil?
+        sigma = @sigma if sigma.nil?
+        
+        return Rating.new mu, sigma
       end
       
-
-      def make_as_global
-        return setup(nil, nil, nil, nil, nil, self)
-      end
-
 
       def validate_rating_groups(rating_groups)
         
         rating_groups.each do |group|
-          
-          if group.is_a? Rating
-            group = [group,]
-          end
-          
-          if group.length == 0
-            raise "each group must contain multiple ratings"
-          end
-        
+          group = [group,] if group.is_a? Rating
+          raise "each group must contain multiple ratings" if group.length == 0
         end
         
-        if rating_groups.length < 2
-          raise "need multiple rating groups"
-        end
-        
+        raise "need multiple rating groups" if rating_groups.length < 2
+          
         return rating_groups
-      
+        
       end
 
 
@@ -334,17 +317,32 @@ module TrueSkill
 
 
 
-    ############################################### true skill general code ############################################
+      ############################################### true skill general code ############################################
+
+
+      def calc_draw_probability(draw_margin,beta,size)
+        return 2 * cdf(draw_margin * (Math.sqrt(size)*beta)) - 1
+      end
+      
+
+      def calc_draw_margin(draw_probability, beta, size)
+        return ppf((draw_probability + 1) / 2.0) * Math.sqrt(size) * beta
+      end
+      
+
+      def _team_sizes(rating_groups)
+        team_sizes=[0]
+        rating_groups.each do |group|
+          team_sizes << group.length+team_sizes.last
+        end
+        
+        team_sizes.delete_at(0)
+        return team_sizes
+      end
 
 
 
-
-
-
-
-
-
-        ########################################### math general stuff ########################################
+      ########################################### math general stuff ########################################
 
 
       def ierfcc(p)
@@ -361,23 +359,19 @@ module TrueSkill
       end
        
 
-       def cdf(x,mu=0,sigma=1)
+      def cdf(x,mu=0,sigma=1)
         return 0.5*Math.erfc(-(x-mu)/(sigma*Math.sqrt(2)))
-       end
+      end
        
 
-       def pdf(x,mu=0,sigma=1)
+      def pdf(x,mu=0,sigma=1)
         return (1/Math.sqrt(2*Math::PI)*sigma.abs)*Math.exp(-(((x-mu)/sigma.abs)**2/2))
-       end
+      end
        
 
-       def ppf(x,mu=0,sigma=1)
+      def ppf(x,mu=0,sigma=1)
         return mu-sigma*Math.sqrt(2)*ierfcc(2*x)
-       end
-
-
-
-
+      end
 
 
     end
