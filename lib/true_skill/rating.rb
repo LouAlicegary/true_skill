@@ -2,12 +2,10 @@ module TrueSkill
 
     class Rating < Gaussian
 
-      include TrueSkillGeneral
-
       attr_accessor :exposure
         
 
-      def initialize(mu=nil,sigma=nil)
+      def initialize(mu=nil, sigma=nil)
         
         mu,sigma = mu if mu.kind_of?(Array)
         
